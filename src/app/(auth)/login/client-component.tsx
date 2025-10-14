@@ -1,4 +1,5 @@
 'use client'
+
 import { Button } from '@/components/button'
 import { Checkbox, CheckboxField } from '@/components/checkbox'
 import { Field, Label } from '@/components/fieldset'
@@ -8,8 +9,7 @@ import { Strong, Text, TextLink } from '@/components/text'
 import { parseForm } from '@/lib/form'
 import { postRequest } from '@/lib/helpers/api'
 import { supabase } from '@/lib/store'
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 export function generateSessionId(length = 64) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -20,8 +20,8 @@ export function generateSessionId(length = 64) {
   return sessionId
 }
 
-export default function ClientComponent() {
-  const search = useSearchParams()
+export default function ClientComponent({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const search = use(searchParams)
 
   const [signingIn, setSigningIn] = useState('Sign In')
   const handleLogin = async (type: string, email: string, password: string) => {
