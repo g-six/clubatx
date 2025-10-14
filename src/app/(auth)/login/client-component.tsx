@@ -20,7 +20,7 @@ export function generateSessionId(length = 64) {
   return sessionId
 }
 
-export default function ClientComponent({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+export default function ClientComponent({ searchParams }: { searchParams: Promise<{ [k: string]: string }> }) {
   const search = use(searchParams)
 
   const [signingIn, setSigningIn] = useState('Sign In')
@@ -66,13 +66,13 @@ export default function ClientComponent({ searchParams }: { searchParams: Promis
   }
 
   useEffect(() => {
-    if (search.get('code')) {
+    if (search.code) {
       setSigningIn('Confirming your sign-in...')
 
       supabase
         .from('credentials')
         .select('*, user(id, first_name, last_name, username)')
-        .eq('code', search.get('code'))
+        .eq('code', search.code)
         .single()
         .then((r) => {
           postRequest('/api/session', {
@@ -82,7 +82,7 @@ export default function ClientComponent({ searchParams }: { searchParams: Promis
           }).then((x) => {
             setSigningIn('Checking for your booking...')
             Promise.all([
-              supabase.from('bookings').select().eq('id', search.get('booking')),
+              supabase.from('bookings').select().eq('id', search.booking),
               supabase.from('credentials').delete().eq('user', r.data.user.username).neq('code', r.data.code),
             ]).then(([bookings]) => {
               if (localStorage.getItem('token')) {
@@ -145,7 +145,7 @@ export default function ClientComponent({ searchParams }: { searchParams: Promis
     }
   }, [])
 
-  if (search.get('code')) {
+  if (search.code) {
     return <p className="w-full text-center">{signingIn}</p>
   }
 
