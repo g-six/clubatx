@@ -22,7 +22,7 @@ export function generateSessionId(length = 64) {
 
 export default function ClientComponent({ searchParams }: { searchParams: Promise<{ [k: string]: string }> }) {
   const search = use(searchParams)
-
+  let redirectTo = '/events'
   const [signingIn, setSigningIn] = useState('Sign In')
   const handleLogin = async (type: string, email: string, password: string) => {
     try {
@@ -90,6 +90,7 @@ export default function ClientComponent({ searchParams }: { searchParams: Promis
                 setSigningIn('Logged in!')
                 if (bookings?.data?.length) {
                   const booking = bookings.data.pop()
+                  redirectTo = `/recordings?booking=${booking.id}`
                   Promise.all([
                     supabase
                       .from('teams')
@@ -130,12 +131,12 @@ export default function ClientComponent({ searchParams }: { searchParams: Promis
                       .then((e) => e.data?.pop()),
                   ]).then(([team, event]) => {
                     setTimeout(() => {
-                      location.href = '/events'
+                      location.href = redirectTo
                     }, 800)
                   })
                 } else {
                   setTimeout(() => {
-                    location.href = '/events'
+                    location.href = redirectTo
                   }, 800)
                 }
               }
