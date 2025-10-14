@@ -8,12 +8,12 @@ export const metadata: Metadata = {
   title: 'Login',
 }
 
-export default function Login() {
+export default function Login({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   return (
     <div className="w-full max-w-xs">
       <Logo size="sm" data-logo-only />
       <Suspense fallback={<>...</>}>
-        <ClientComponent />
+        <ClientComponent searchParams={searchParams} />
       </Suspense>
     </div>
   )
