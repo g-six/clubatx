@@ -57,7 +57,7 @@ export function CreateItemDialog() {
                 <Field>
                   <Label>Delivery notes</Label>
                   <Textarea name="notes" />
-                  <Description>If you have a tiger, we'd like to know about it.</Description>
+                  <Description>If you have a tiger, we&rsquo;d like to know about it.</Description>
                 </Field>
               </FieldGroup>
             </Fieldset>
