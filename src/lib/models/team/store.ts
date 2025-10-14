@@ -13,7 +13,7 @@ export const useTeams = (): { records: Team[] } => {
 
   // Load initial data and set up listeners
   useEffect(() => {
-    if (ctx.user) fetchTeams(ctx.user.id, setRecords)
+    if (ctx.user?.id) fetchTeams(ctx.user.id, setRecords)
 
     // Listen for new and deleted teams
     const listener = supabase
