@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Register() {
   return (
     <div className="w-full max-w-xs">
-      <Logo className="h-6 text-zinc-950 dark:text-white forced-colors:text-[CanvasText]" />
+      <Logo size="sm" data-logo-only />
       <ClientComponent />
     </div>
   )
