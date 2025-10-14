@@ -19,7 +19,7 @@ export function CreateItemDialog() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!ctx.user) return
+    if (!ctx.user?.id) return
 
     const form = event.currentTarget
     const data = parseForm(form) as unknown as Location
