@@ -1,8 +1,20 @@
-import { getEvents } from '@/data'
+import { headers } from 'next/headers'
 import { ApplicationLayout } from './application-layout'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  let events = await getEvents()
+  const h = await headers()
+  const cookieStore = h.get('cookie') || ''
 
-  return <ApplicationLayout events={events}>{children}</ApplicationLayout>
+  return (
+    <ApplicationLayout
+      data-token={
+        cookieStore
+          .split('; ')
+          .find((c) => c.startsWith('token='))
+          ?.split('=')[1]
+      }
+    >
+      {children}
+    </ApplicationLayout>
+  )
 }

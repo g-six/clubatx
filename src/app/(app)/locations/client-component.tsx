@@ -1,0 +1,149 @@
+'use client'
+import { Badge } from '@/components/badge'
+import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
+import { Input, InputGroup } from '@/components/input'
+import { Link } from '@/components/link'
+import { Select } from '@/components/select'
+import { filterLocations, Location } from '@/lib/models/location'
+import { useLocations } from '@/lib/models/location/store'
+import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
+import { useEffect, useState } from 'react'
+import { CreateItemDialog } from './create'
+
+function getFacilityTypeColor(
+  facility_type: string
+):
+  | 'red'
+  | 'orange'
+  | 'amber'
+  | 'yellow'
+  | 'lime'
+  | 'green'
+  | 'emerald'
+  | 'teal'
+  | 'cyan'
+  | 'sky'
+  | 'blue'
+  | 'indigo'
+  | 'violet'
+  | 'purple'
+  | 'fuchsia'
+  | 'pink'
+  | 'rose'
+  | 'zinc' {
+  switch (facility_type) {
+    case 'TURF':
+      return 'violet'
+    case 'GRASS':
+      return 'green'
+    case 'INDOOR TURF':
+      return 'purple'
+    case 'GYM':
+      return 'orange'
+    case 'FUTSAL':
+      return 'cyan'
+    default:
+      return 'zinc'
+  }
+}
+export default function LocationsPageClientComponent() {
+  const l = useLocations()
+  const [sort, sortBy] = useState<string>('name')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState<Promise<any>>()
+  const [locations, setLocations] = useState<Location[]>([])
+  console.log(l)
+  useEffect(() => {
+    let handler: NodeJS.Timeout
+    if (search) {
+      handler = setTimeout(() => setDebouncedSearch(filterLocations(search)), 300)
+    }
+    return () => clearTimeout(handler)
+  }, [search])
+
+  useEffect(() => {
+    if (debouncedSearch)
+      debouncedSearch.then((results) => {
+        setLocations(results || [])
+      })
+  }, [debouncedSearch])
+
+  // Optionally, filter locations here using debouncedSearch
+
+  return (
+    <>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-sm:w-full sm:flex-1">
+          <div className="mt-4 flex max-w-xl gap-4">
+            <div className="flex-1">
+              <InputGroup>
+                <MagnifyingGlassIcon />
+                <Input
+                  name="search"
+                  placeholder="Search locations&hellip;"
+                  onChange={(e) => {
+                    setLoading(true)
+                    setDebouncedSearch(undefined)
+                    setSearch(`${e.currentTarget.value}%`)
+                  }}
+                />
+              </InputGroup>
+            </div>
+            <div>
+              <Select name="sort_by" onChange={(e) => sortBy(e.currentTarget.value)}>
+                <option value="name">Sort by name</option>
+                <option value="location_type">Sort by type</option>
+                <option value="city_town">Sort by city</option>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <CreateItemDialog />
+      </div>
+      <ul className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {locations
+          .sort((a: any, b: any) => {
+            if (a[sort] < b[sort]) return -1
+            if (a[sort] > b[sort]) return 1
+            return 0
+          })
+          .map((item, index) => (
+            <li key={item.name} className="rounded-xl bg-black/5 py-4 dark:bg-black">
+              <div className="flex items-start justify-between">
+                <div className="flex w-5/6 gap-6 lg:w-3/4">
+                  <div className="text-overflow-ellipsis w-full space-y-1.5 overflow-hidden py-1 pl-6 text-ellipsis">
+                    <div className="w-full overflow-hidden text-sm/6 font-semibold text-ellipsis whitespace-nowrap">
+                      <Link href={`/location/${item.name}`}>{item.name}</Link>
+                    </div>
+                    <div className="text-xs text-zinc-500">
+                      {[item.street_1, item.street_2].filter(Boolean).join(', ')}
+                      <br />
+                      {[item.city_town, [item.state_province, item.postal_zip_code].filter(Boolean).join(' ')]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex w-1/6 items-center justify-end lg:w-1/4">
+                  <Badge className="max-sm:hidden" color={getFacilityTypeColor(item.facility_type)}>
+                    {item.facility_type}
+                  </Badge>
+                  <Dropdown>
+                    <DropdownButton plain aria-label="More options">
+                      <EllipsisVerticalIcon />
+                    </DropdownButton>
+                    <DropdownMenu anchor="bottom end">
+                      <DropdownItem href={`/location/${item.name}`}>View</DropdownItem>
+                      <DropdownItem>Edit</DropdownItem>
+                      <DropdownItem>Book</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
+              </div>
+            </li>
+          ))}
+      </ul>
+    </>
+  )
+}

@@ -16,8 +16,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className="text-zinc-950 antialiased lg:bg-zinc-100 dark:bg-zinc-900 dark:text-white dark:lg:bg-zinc-950"
     >
       <head>
-        <link rel="preconnect" href="https://rsms.me/" />
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        <link rel="stylesheet" href="/fonts/inter.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={''} />
+        <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet" />
+        <style>{`.ztz {
+  font-family: "Zen Tokyo Zoo", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}`}</style>
       </head>
       <body>{children}</body>
     </html>
