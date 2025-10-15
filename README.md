@@ -1,6 +1,6 @@
-# Catalyst Demo
+# ClubAtx
 
-To run the Catalyst demo, first install the npm dependencies:
+To run ClubAtx, first install the npm dependencies:
 
 ```bash
 npm install

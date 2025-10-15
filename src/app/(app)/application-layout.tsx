@@ -134,7 +134,7 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
                       slot="icon"
                       src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo-xl.png"
                     />
-                    <DropdownLabel>Catalyst</DropdownLabel>
+                    <DropdownLabel>ClubAtx</DropdownLabel>
                   </DropdownItem>
                   <DropdownItem href="#">
                     <Avatar slot="icon" initials="BE" className="bg-purple-500 text-white" />
