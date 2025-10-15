@@ -13,6 +13,7 @@ import { filterTeamMemberships } from '@/lib/models/team'
 import { Team } from '@/lib/models/team/types'
 import { supabase } from '@/lib/store'
 import { XCircleIcon } from '@heroicons/react/16/solid'
+import { decode } from 'jsonwebtoken'
 import { FormEvent, useEffect, useState } from 'react'
 import { Select } from './select'
 
@@ -23,6 +24,7 @@ export function BookDialog() {
   const [teamKeyword, setTeamKeyword] = useState('')
   const [email, setEmail] = useState('')
   const [teams, setTeams] = useState<Team[]>([])
+  const [user, setUser] = useState<Record<string, any> | null>(null)
 
   // Debounce teamKeyword updates
   useEffect(() => {
@@ -36,6 +38,30 @@ export function BookDialog() {
   }, [teamKeyword, email])
 
   let [isOpen, setIsOpen] = useState(false)
+
+  // Check session
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      try {
+        const payload = decode(localStorage.getItem('token')!) as any
+        if (payload.username) {
+          const { username, id, first_name, last_name, ...rest } = payload
+          setEmail(username)
+          setUser({
+            username,
+            id,
+            first_name,
+            last_name,
+            email: username,
+          })
+        }
+      } finally {
+        console.log('Session check complete')
+      }
+    }
+  }, [])
+
+  console.table(user)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -53,12 +79,16 @@ export function BookDialog() {
     }
     try {
       setStatus('Creating...')
-      const result = await signUp(data)
+      data.phone = data.phone || ''
+      const result = await signUp({
+        ...data,
+        ...user,
+      })
       if (result?.session) {
         const booking = await supabase
           .from('bookings')
           .insert({
-            booked_by: data.email,
+            booked_by: user?.email || data.email,
             team,
             location: data.location,
             start_date,
@@ -68,10 +98,10 @@ export function BookDialog() {
           .single()
         if (booking?.data) {
           const email = await postRequest('/api/email', {
-            TemplateAlias: 'user-login',
+            TemplateAlias: 'booking-confirmation',
             TemplateModel: {
               action_url: `${location.href.split('/').slice(0, 3).join('/')}/login?code=${result.session.code}&booking=${booking.data.id}`,
-              name: data.first_name,
+              name: user?.first_name || data.first_name,
             },
             To: booking.data.booked_by,
           })
@@ -103,62 +133,81 @@ export function BookDialog() {
             {/* ... */}
             <Fieldset>
               <FieldGroup>
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-2">
-                  <Field className="sm:col-span-2">
-                    <Label>Email</Label>
-                    <Input onChange={(e) => setEmail(e.target.value)} type="email" name="email" autoFocus />
-                  </Field>
+                {!Boolean(user?.username) && (
+                  <>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-2">
+                      <Field className="sm:col-span-2">
+                        <Label>Email</Label>
+                        <Input
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          type="email"
+                          name="email"
+                          autoFocus
+                          disabled={Boolean(user?.username)}
+                        />
+                      </Field>
 
-                  <Field>
-                    <Label>Phone</Label>
-                    <Input name="phone" type="tel" />
-                  </Field>
-                </div>
+                      <Field>
+                        <Label>Phone</Label>
+                        <Input name="phone" type="tel" defaultValue={user?.phone} />
+                      </Field>
+                    </div>
 
-                <Headless.Field className="flex flex-wrap items-center justify-center gap-y-2">
-                  <Label className="w-full">Enter contact name</Label>
+                    <Headless.Field className="flex flex-wrap items-center justify-center gap-y-2">
+                      <Label className="w-full">Enter contact name</Label>
 
-                  <Input
-                    name="first_name"
-                    className="rounded-0! w-1/2! rounded-l"
-                    inputClassName="rounded-l-lg border-y border-l"
-                    placeholder="Enter first name"
-                  />
-                  <Input
-                    name="last_name"
-                    className="rounded-0! w-1/2! rounded-r"
-                    inputClassName="rounded-r-lg border-y border-r"
-                    placeholder="Enter last name"
-                  />
-                </Headless.Field>
+                      <Input
+                        name="first_name"
+                        className="rounded-0! w-1/2! rounded-l"
+                        inputClassName="rounded-l-lg border-y border-l"
+                        placeholder="Enter first name"
+                      />
+                      <Input
+                        name="last_name"
+                        className="rounded-0! w-1/2! rounded-r"
+                        inputClassName="rounded-r-lg border-y border-r"
+                        placeholder="Enter last name"
+                      />
+                    </Headless.Field>
+                  </>
+                )}
                 <Field>
                   <Label>Team name</Label>
                   <Input
                     name="team"
                     value={teamKeyword}
+                    placeholder={user?.username ? 'Start typing to search...' : 'Enter team name'}
                     onChange={(evt) => {
                       setTeamKeyword(evt.target.value)
                     }}
                   />
                   <div className="relative w-full">
                     <div className="backdrop-blur-2xl/50 absolute top-1 z-10 max-h-40 w-full rounded-xl bg-black">
-                      {teamKeyword.length >= 2 &&
-                        !teams.find((t) => t.name.toLowerCase() === teamKeyword.toLowerCase()) &&
-                        teams
-                          .filter((team) => team.name.toLowerCase().startsWith(teamKeyword.toLowerCase()))
-                          .map((team) => (
-                            <Button
-                              key={team.name}
-                              onClick={() => {
-                                setTeamKeyword(team.name)
-                                setTeams([])
-                              }}
-                              color="rose"
-                              className="m-0.5"
-                            >
-                              {team.name}
-                            </Button>
-                          ))}
+                      {teams
+                        .filter((team) => {
+                          if (teamKeyword.length >= 2) {
+                            return (
+                              !teams.find((t) => t.name.toLowerCase() === teamKeyword.toLowerCase()) &&
+                              team.name.toLowerCase().includes(teamKeyword.toLowerCase())
+                            )
+                          }
+                          return teamKeyword.length === 0
+                        })
+                        .slice(0, 3)
+                        .map((team) => (
+                          <Button
+                            key={team.name}
+                            onClick={() => {
+                              setTeamKeyword(team.name)
+                              setTeams([])
+                            }}
+                            color="rose"
+                            className="m-0.5"
+                          >
+                            {team.name}
+                          </Button>
+                        ))}
                     </div>
                   </div>
                 </Field>
