@@ -16,7 +16,9 @@ export default function LoginDialogComponent({ searchParams }: { searchParams: P
           type="button"
           className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-zinc-800 to-zinc-700 text-white shadow-lg sm:hidden"
           onClick={() => {
-            setOpen(true)
+            const token = (typeof window !== 'undefined' && localStorage.getItem('token')) || null
+            if (!token) setOpen(true)
+            else window.location.href = '/recordings'
           }}
         >
           <ArrowRightEndOnRectangleIcon className="size-8" />

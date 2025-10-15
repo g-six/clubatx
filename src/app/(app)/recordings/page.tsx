@@ -12,7 +12,9 @@ export default async function RecordingsPage() {
     <>
       <div className="flex items-end justify-between gap-4">
         <Heading>Recordings</Heading>
-        <CreateItemDialog />
+        <div className="max-sm:hidden">
+          <CreateItemDialog />
+        </div>
       </div>
       <ClientComponent />
     </>

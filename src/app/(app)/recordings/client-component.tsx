@@ -6,7 +6,7 @@ import { ViewDialog } from './player'
 import TimelineComponent from './timeline'
 export default function ClientComponent() {
   const recordings = useRecordings()
-  console.log(recordings)
+
   return (
     <>
       <TimelineComponent items={recordings} />

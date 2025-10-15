@@ -141,7 +141,7 @@ export function BookDialog() {
       </Button>
       <button
         type="button"
-        className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-lg sm:hidden"
+        className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-lime-500 to-green-500 text-white shadow-lg sm:hidden"
         onClick={() => {
           setIsOpen(true)
         }}

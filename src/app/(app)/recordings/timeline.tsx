@@ -8,60 +8,11 @@ import { ChatBubbleLeftEllipsisIcon, TagIcon, VideoCameraIcon } from '@heroicons
 import { Fragment, useContext } from 'react'
 import { ViewDialog } from './player'
 
-const defaultItems: any[] = [
-  {
-    slug: 'dc706c2f8d05647d8742a6d25660f2ab',
-    id: 1,
-    status: 'AVAILABLE',
-    name: 'Eduardo Benz',
-    person: { name: 'Eduardo Benz', href: '#' },
-    imageUrl:
-      'https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80',
-    comment:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tincidunt nunc ipsum tempor purus vitae id. Morbi in vestibulum nec varius. Et diam cursus quis sed purus nam.',
-    date: '6d ago',
-  },
-  {
-    id: 2,
-
-    slug: 'a20712649e1f04a37bc38da53cd219ee',
-    status: 'PENDING',
-    name: 'Hilary Mahy',
-    person: { name: 'Hilary Mahy', href: '#' },
-    assigned: { name: 'Kristin Watson', href: '#' },
-    date: '2d ago',
-  },
-  {
-    slug: 'e68c8465bb830973d60db71db2691340',
-    id: 3,
-    status: 'tags',
-    name: 'Hilary Mahy',
-    person: { name: 'Hilary Mahy', href: '#' },
-    tags: [
-      { name: 'Bug', href: '#', color: 'fill-red-500' },
-      { name: 'Accessibility', href: '#', color: 'fill-indigo-500' },
-    ],
-    date: '6h ago',
-  },
-  {
-    slug: '7ec9dbcc814569074a7e66ede8605cb7',
-    id: 4,
-    status: 'comment',
-    name: 'Hilary Mahy',
-    person: { name: 'Jason Meyers', href: '#' },
-    imageUrl:
-      'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=256&h=256&q=80',
-    comment:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tincidunt nunc ipsum tempor purus vitae id. Morbi in vestibulum nec varius. Et diam cursus quis sed purus nam. Scelerisque amet elit non sit ut tincidunt condimentum. Nisl ultrices eu venenatis diam.',
-    date: '2h ago',
-  },
-]
-
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function TimelineComponent({ items = defaultItems }: { items?: typeof defaultItems }) {
+export default function TimelineComponent({ items = [] }: { items?: any[] }) {
   const ctx = useContext(UserContext)
   return (
     <div className="mt-6 flow-root">

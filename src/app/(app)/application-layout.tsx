@@ -104,9 +104,16 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
             <NavbarSection>
               <Dropdown>
                 <DropdownButton as={NavbarItem}>
-                  <Avatar
+                  {/* <Avatar
                     src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo.png"
-                    square
+                    className="size-8"
+                  /> */}
+                  <div
+                    style={{
+                      backgroundImage: `url(https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo.png)`,
+                    }}
+                    className="size-8 bg-contain bg-center bg-no-repeat"
+                    title="ClubAthletix"
                   />
                 </DropdownButton>
                 <AccountDropdownMenu anchor="bottom end" />
