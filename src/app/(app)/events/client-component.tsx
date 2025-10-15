@@ -103,7 +103,15 @@ export default function EventsPageClientComponent() {
             <div key={item.slug} className="pb-6">
               <div className="flex justify-between max-sm:flex-col max-sm:items-center max-sm:justify-start">
                 <div className="flex gap-6 max-sm:w-full max-sm:pb-6">
-                  <div className="space-y-1.5">
+                  <div
+                    className={`space-y-1.5 ${
+                      getDaysHoursMinutesBeforeKickoff(
+                        getLocalDateFromDateAndTime(item.start_date, item.start_time)
+                      ).best?.endsWith('ago')
+                        ? 'opacity-30'
+                        : ''
+                    }`.trim()}
+                  >
                     <div className="font-semibold capitalize max-sm:text-2xl/8 sm:text-base/6">
                       {item.event_type.toLowerCase()}
                     </div>
@@ -112,7 +120,7 @@ export default function EventsPageClientComponent() {
                         {item.team}
                       </Badge>
                       {item.opponent && (
-                        <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'rose'}>
+                        <Badge className="capitalize" color="rose">
                           {item.opponent}
                         </Badge>
                       )}

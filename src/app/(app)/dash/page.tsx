@@ -1,6 +1,6 @@
 import { Stat } from '@/app/stat'
 
-import AthletesList from '@/app/(app)/athletes/list'
+import AthletesList from '@/components/athletes/list'
 import Greeting from '@/components/greeting'
 
 export default async function Home() {
