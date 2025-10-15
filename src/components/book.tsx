@@ -73,7 +73,7 @@ export function BookDialog() {
               action_url: `${location.href.split('/').slice(0, 3).join('/')}/login?code=${result.session.code}&booking=${booking.data.id}`,
               name: data.first_name,
             },
-            To: 'gerard@nerubia.com',
+            To: booking.data.booked_by,
           })
 
           if (email?.Message === 'OK') {
