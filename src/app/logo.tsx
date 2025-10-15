@@ -1,4 +1,43 @@
-export function Logo({ className, ...props }: React.ComponentPropsWithoutRef<'svg'>) {
+import Image from 'next/image'
+
+export function Logo({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'> & { size: 'sm' | 'md' | 'lg'; 'data-logo-only'?: any }) {
+  return (
+    <div className={`${className || 'flex flex-col items-center'} group`.trim()}>
+      {!Boolean(props['data-logo-only']) && (
+        <div
+          className={[
+            'ztz group:data-logo-only:hidden -mr-0.75 flex items-center font-semibold tracking-tight text-pretty uppercase',
+            props.size === 'lg'
+              ? 'pt-1.5 text-3xl lg:text-5xl'
+              : props.size === 'md'
+                ? 'h-8 pt-1.5 text-3xl lg:text-4xl'
+                : 'h-4 pt-0.5 lg:text-xl',
+          ].join(' ')}
+        >
+          clubatx
+        </div>
+      )}
+      <Image
+        alt="ClubAtx"
+        src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo-sm.png"
+        width={32}
+        height={32}
+        className="sm:hidden"
+      />
+      <Image
+        alt="ClubAtx"
+        src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo-xl.png"
+        width={48}
+        height={48}
+        className="hidden md:block"
+      />
+    </div>
+  )
+}
+export function SvgLogo({ className, ...props }: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg fill="currentColor" viewBox="0 0 113 22" {...props} className={className}>
       <path

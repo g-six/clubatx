@@ -1,52 +1,36 @@
 'use client'
-
 import { Avatar } from '@/components/avatar'
-import {
-  Dropdown,
-  DropdownButton,
-  DropdownDivider,
-  DropdownItem,
-  DropdownLabel,
-  DropdownMenu,
-} from '@/components/dropdown'
+import { Dropdown, DropdownButton, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/dropdown'
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '@/components/navbar'
 import {
   Sidebar,
   SidebarBody,
   SidebarFooter,
   SidebarHeader,
-  SidebarHeading,
   SidebarItem,
   SidebarLabel,
   SidebarSection,
-  SidebarSpacer,
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
-import { getEvents } from '@/data'
+import { useApp } from '@/lib/models/session/store'
+import { supabase } from '@/lib/store'
+import UserContext from '@/lib/user-context'
 import {
   ArrowRightStartOnRectangleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  Cog8ToothIcon,
-  LightBulbIcon,
-  PlusIcon,
   ShieldCheckIcon,
-  UserCircleIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/16/solid'
-import {
-  Cog6ToothIcon,
-  HomeIcon,
-  QuestionMarkCircleIcon,
-  SparklesIcon,
-  Square2StackIcon,
-  TicketIcon,
-} from '@heroicons/react/20/solid'
-import { usePathname } from 'next/navigation'
+import { Cog6ToothIcon, HomeIcon, MapPinIcon, Square2StackIcon } from '@heroicons/react/20/solid'
+import { Session } from '@supabase/supabase-js'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
-      <DropdownItem href="#">
+      {/* <DropdownItem href="#">
         <UserCircleIcon />
         <DropdownLabel>My account</DropdownLabel>
       </DropdownItem>
@@ -59,7 +43,7 @@ function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' })
         <LightBulbIcon />
         <DropdownLabel>Share feedback</DropdownLabel>
       </DropdownItem>
-      <DropdownDivider />
+      <DropdownDivider /> */}
       <DropdownItem href="/login">
         <ArrowRightStartOnRectangleIcon />
         <DropdownLabel>Sign out</DropdownLabel>
@@ -68,126 +52,184 @@ function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' })
   )
 }
 
-export function ApplicationLayout({
-  events,
-  children,
-}: {
-  events: Awaited<ReturnType<typeof getEvents>>
-  children: React.ReactNode
-}) {
+export function ApplicationLayout({ children, ...props }: { children: React.ReactNode }) {
+  const { 'data-token': token } = props as Record<string, string>
+  const user = useApp({ token })
+
   let pathname = usePathname()
+  const [authLoaded, setUserLoaded] = useState<boolean>(false)
 
-  return (
-    <SidebarLayout
-      navbar={
-        <Navbar>
-          <NavbarSpacer />
-          <NavbarSection>
-            <Dropdown>
-              <DropdownButton as={NavbarItem}>
-                <Avatar src="/users/erica.jpg" square />
-              </DropdownButton>
-              <AccountDropdownMenu anchor="bottom end" />
-            </Dropdown>
-          </NavbarSection>
-        </Navbar>
-      }
-      sidebar={
-        <Sidebar>
-          <SidebarHeader>
-            <Dropdown>
-              <DropdownButton as={SidebarItem}>
-                <Avatar src="/teams/catalyst.svg" />
-                <SidebarLabel>Catalyst</SidebarLabel>
-                <ChevronDownIcon />
-              </DropdownButton>
-              <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
-                <DropdownItem href="/settings">
-                  <Cog8ToothIcon />
-                  <DropdownLabel>Settings</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="#">
-                  <Avatar slot="icon" src="/teams/catalyst.svg" />
-                  <DropdownLabel>Catalyst</DropdownLabel>
-                </DropdownItem>
-                <DropdownItem href="#">
-                  <Avatar slot="icon" initials="BE" className="bg-purple-500 text-white" />
-                  <DropdownLabel>Big Events</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="#">
-                  <PlusIcon />
-                  <DropdownLabel>New team&hellip;</DropdownLabel>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </SidebarHeader>
+  const [s, setSession] = useState<Session | null>(null)
+  const router = useRouter()
 
-          <SidebarBody>
-            <SidebarSection>
-              <SidebarItem href="/" current={pathname === '/'}>
-                <HomeIcon />
-                <SidebarLabel>Home</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="/events" current={pathname.startsWith('/events')}>
-                <Square2StackIcon />
-                <SidebarLabel>Events</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="/orders" current={pathname.startsWith('/orders')}>
-                <TicketIcon />
-                <SidebarLabel>Orders</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
-                <Cog6ToothIcon />
-                <SidebarLabel>Settings</SidebarLabel>
-              </SidebarItem>
-            </SidebarSection>
+  useEffect(() => {
+    function saveSession(
+      /** @type {Awaited<ReturnType<typeof supabase.auth.`getSession>>['data']['session']} */
+      session: Session
+    ) {
+      setSession(session)
+      const currentUser: any = session?.user
 
-            <SidebarSection className="max-lg:hidden">
-              <SidebarHeading>Upcoming Events</SidebarHeading>
-              {events.map((event) => (
-                <SidebarItem key={event.id} href={event.url}>
-                  {event.name}
+      setUserLoaded(!!currentUser)
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      return session && saveSession(session)
+    })
+
+    return () => {}
+  }, [])
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (!error) {
+      router.push('/')
+    }
+  }
+  return user?.id ? (
+    <UserContext.Provider
+      value={{
+        authLoaded,
+        user,
+        signOut,
+        token,
+      }}
+    >
+      <SidebarLayout
+        navbar={
+          <Navbar>
+            <NavbarSpacer />
+            <NavbarSection>
+              <Dropdown>
+                <DropdownButton as={NavbarItem}>
+                  <Avatar
+                    src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo.png"
+                    square
+                  />
+                </DropdownButton>
+                <AccountDropdownMenu anchor="bottom end" />
+              </Dropdown>
+            </NavbarSection>
+          </Navbar>
+        }
+        sidebar={
+          <Sidebar>
+            <SidebarHeader>
+              <Dropdown>
+                <DropdownButton as={SidebarItem}>
+                  <Avatar src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo-xl.png" />
+                  <SidebarLabel>ClubAthletix</SidebarLabel>
+                  <ChevronDownIcon />
+                </DropdownButton>
+                {/* <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
+                  <DropdownItem href="/settings">
+                    <Cog8ToothIcon />
+                    <DropdownLabel>Settings</DropdownLabel>
+                  </DropdownItem>
+                  <DropdownDivider />
+                  <DropdownItem href="#">
+                    <Avatar
+                      slot="icon"
+                      src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo-xl.png"
+                    />
+                    <DropdownLabel>Catalyst</DropdownLabel>
+                  </DropdownItem>
+                  <DropdownItem href="#">
+                    <Avatar slot="icon" initials="BE" className="bg-purple-500 text-white" />
+                    <DropdownLabel>Big Events</DropdownLabel>
+                  </DropdownItem>
+                  <DropdownDivider />
+                  <DropdownItem href="#">
+                    <PlusIcon />
+                    <DropdownLabel>New team&hellip;</DropdownLabel>
+                  </DropdownItem>
+                </DropdownMenu> */}
+              </Dropdown>
+            </SidebarHeader>
+
+            <SidebarBody>
+              <SidebarSection>
+                <SidebarItem href="/dash" current={pathname === '/dash'}>
+                  <HomeIcon />
+                  <SidebarLabel>Home</SidebarLabel>
                 </SidebarItem>
-              ))}
-            </SidebarSection>
+                <SidebarItem href="/events" current={pathname.startsWith('/events')}>
+                  <Square2StackIcon />
+                  <SidebarLabel>Events</SidebarLabel>
+                </SidebarItem>
+                <SidebarItem href="/recordings" current={pathname.startsWith('/recordings')}>
+                  <VideoCameraIcon />
+                  <SidebarLabel>Recordings</SidebarLabel>
+                </SidebarItem>
+                {user?.roles?.map((r) => r.toUpperCase()).includes('ADMIN') && (
+                  <>
+                    <SidebarItem href="/teams" current={pathname.startsWith('/teams')}>
+                      <ShieldCheckIcon />
+                      <SidebarLabel>Teams</SidebarLabel>
+                    </SidebarItem>
+                    <SidebarItem href="/locations" current={pathname.startsWith('/location')}>
+                      <MapPinIcon />
+                      <SidebarLabel>Locations</SidebarLabel>
+                    </SidebarItem>
+                    <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
+                      <Cog6ToothIcon />
+                      <SidebarLabel>Settings</SidebarLabel>
+                    </SidebarItem>
+                  </>
+                )}
+              </SidebarSection>
 
-            <SidebarSpacer />
+              {/* <SidebarSection className="max-lg:hidden">
+                <SidebarHeading>Upcoming Events</SidebarHeading>
 
-            <SidebarSection>
-              <SidebarItem href="#">
-                <QuestionMarkCircleIcon />
-                <SidebarLabel>Support</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="#">
-                <SparklesIcon />
-                <SidebarLabel>Changelog</SidebarLabel>
-              </SidebarItem>
-            </SidebarSection>
-          </SidebarBody>
+                <SidebarItem>sidebar</SidebarItem>
+              </SidebarSection> */}
 
-          <SidebarFooter className="max-lg:hidden">
-            <Dropdown>
-              <DropdownButton as={SidebarItem}>
-                <span className="flex min-w-0 items-center gap-3">
-                  <Avatar src="/users/erica.jpg" className="size-10" square alt="" />
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">Erica</span>
-                    <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
-                      erica@example.com
+              {/* <SidebarSpacer />
+
+              <SidebarSection>
+                <SidebarItem href="#">
+                  <QuestionMarkCircleIcon />
+                  <SidebarLabel>Support</SidebarLabel>
+                </SidebarItem>
+                <SidebarItem href="#">
+                  <SparklesIcon />
+                  <SidebarLabel>Changelog</SidebarLabel>
+                </SidebarItem>
+              </SidebarSection> */}
+            </SidebarBody>
+
+            <SidebarFooter className="max-lg:hidden">
+              <Dropdown>
+                <DropdownButton as={SidebarItem}>
+                  <span className="flex min-w-0 items-center gap-3">
+                    <Avatar
+                      src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo.png"
+                      className="size-10"
+                      square
+                      alt=""
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
+                        {[user?.first_name, user?.last_name].filter(Boolean).join(' ')}
+                      </span>
+                      <span className="block truncate text-xs/5 font-normal text-zinc-500 dark:text-zinc-400">
+                        {user?.username}
+                      </span>
                     </span>
                   </span>
-                </span>
-                <ChevronUpIcon />
-              </DropdownButton>
-              <AccountDropdownMenu anchor="top start" />
-            </Dropdown>
-          </SidebarFooter>
-        </Sidebar>
-      }
-    >
-      {children}
-    </SidebarLayout>
+                  <ChevronUpIcon />
+                </DropdownButton>
+                <AccountDropdownMenu anchor="top start" />
+              </Dropdown>
+            </SidebarFooter>
+          </Sidebar>
+        }
+      >
+        {children}
+      </SidebarLayout>
+    </UserContext.Provider>
+  ) : (
+    <></>
   )
 }
