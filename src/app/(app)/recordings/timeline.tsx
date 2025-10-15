@@ -120,7 +120,7 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                         </div>
                       </div>
                     </>
-                  ) : item.status?.toLowerCase() === 'pending' ? (
+                  ) : ['pending', 'paying', 'paid'].includes(item.status?.toLowerCase()) ? (
                     <>
                       <div>
                         <div className="relative px-1">
@@ -133,7 +133,7 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                         <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
                           Booked for {item.team}{' '}
                         </div>
-                        <Badge>
+                        <Badge color={item.status?.toLowerCase() === 'paid' ? 'lime' : 'yellow'}>
                           {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(
                             new Date(`${item.event_date} ${item.event_time}:00`)
                           )}

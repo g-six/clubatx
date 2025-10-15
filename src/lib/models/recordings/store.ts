@@ -55,7 +55,7 @@ export default function useRecordings() {
           event_time: booking.start_time,
           slug: booking.id,
           event_type: 'MATCH',
-          status: 'PENDING',
+          status: booking.status || 'PENDING',
         })
       }
       setRecordings(recs)
