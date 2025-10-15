@@ -194,7 +194,7 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                                 ].join('&')}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                color="lime"
+                                color="indigo"
                                 className="w-full"
                               >
                                 Complete Payment
