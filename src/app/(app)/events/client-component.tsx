@@ -2,7 +2,6 @@
 import { Badge } from '@/components/badge'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
 import { Label } from '@/components/fieldset'
-import { Link } from '@/components/link'
 import { Switch } from '@/components/switch'
 import { postRequest } from '@/lib/helpers/api'
 import { getFormattedTime, getLocalDateFromDateAndTime } from '@/lib/helpers/datetime'
@@ -101,11 +100,7 @@ export default function EventsPageClientComponent() {
               <div className="flex items-center justify-between max-sm:flex-col">
                 <div className="flex gap-6 py-6">
                   <div className="space-y-1.5">
-                    <div className="text-base/6 font-semibold">
-                      <Link href={`/events/${item.slug}`} className="capitalize">
-                        {item.event_type}
-                      </Link>
-                    </div>
+                    <div className="text-base/6 font-semibold capitalize">{item.event_type.toLowerCase()}</div>
                     <div className="text-xs/6 text-zinc-500">
                       {item.location}
                       <span aria-hidden="true">{' • '}</span>
