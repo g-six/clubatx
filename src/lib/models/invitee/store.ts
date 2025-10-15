@@ -1,17 +1,19 @@
 import { supabase } from '@/lib/store'
+import UserContext from '@/lib/user-context'
 import { REALTIME_LISTEN_TYPES } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { fetchInvitees } from '.'
 import { Invitee } from './types'
 
 export const useInvitees = (): { records: Invitee[]; deletedRecord: Invitee | null } => {
+  const ctx = useContext(UserContext)
   const [records, setRecords] = useState<Invitee[]>([])
   const [newRecord, handleNewRecord] = useState<Invitee | null>(null)
   const [deletedRecord, handleDeletedRecord] = useState<Invitee | null>(null)
 
   // Load initial data and set up listeners
   useEffect(() => {
-    fetchInvitees(setRecords)
+    if (ctx.user?.id) fetchInvitees(ctx.user.id, setRecords)
 
     // Listen for new and deleted teams
     const listener = supabase

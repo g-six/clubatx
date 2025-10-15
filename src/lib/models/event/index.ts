@@ -1,9 +1,6 @@
-import { Cookies } from '@/lib/helpers/cookie'
 import { CalendarEvent, InsertCalendarEvent } from '@/lib/models/event/types'
 import { supabase } from '@/lib/store'
 import { Dispatch, SetStateAction } from 'react'
-
-const cookies = Cookies()
 /**
  * Inserts a new event record into the database.
  *
@@ -68,6 +65,7 @@ export const fetchEvents = async (
  * @param {function} setState Optionally pass in a hook or callback to set the state
  */
 export const fetchFutureEvents = async (
+  user_id: string,
   setState?: Dispatch<SetStateAction<CalendarEvent[]>>
 ): Promise<CalendarEvent[] | undefined> => {
   const event_columns = 'slug, team, event_type, start_date, start_time, duration, location'
@@ -76,9 +74,9 @@ export const fetchFutureEvents = async (
       .from('events')
       .select('*, invitees(invitee:athlete(slug,first_name,phone))')
       .filter('start_date', 'gte', new Date().toISOString())
-      .eq('created_by', cookies.id)
+      .eq('created_by', user_id)
 
-    const { data: athletes } = await supabase.from('athletes').select('invitees(*)').eq('created_by', cookies.id)
+    const { data: athletes } = await supabase.from('athletes').select('invitees(*)').eq('created_by', user_id)
 
     if (setState && data) setState(data)
     return data as CalendarEvent[]

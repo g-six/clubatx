@@ -1,18 +1,19 @@
 import { REALTIME_LISTEN_TYPES } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { fetchAthletes } from './models/athlete'
 import { supabase } from './store'
 import { Athlete } from './types/athlete.types'
+import UserContext from './user-context'
 
 export const useAthleteStore = (): { records: Athlete[] } => {
+  const ctx = useContext(UserContext)
   const [records, setRecords] = useState<Athlete[]>([])
-
   const [newRecord, handleNewRecord] = useState<Athlete | null>(null)
   const [deletedRecord, handleDeletedRecord] = useState<Athlete | null>(null)
 
   // Load initial data and set up listeners
   useEffect(() => {
-    fetchAthletes(setRecords)
+    if (ctx.user?.id) fetchAthletes(ctx.user?.id, setRecords)
 
     // Listen for new and deleted records
     const listener = supabase

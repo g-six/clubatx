@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction } from 'react'
-import { Cookies } from '../helpers/cookie'
 import { supabase } from '../store'
 import { Athlete, InsertAthlete } from '../types/athlete.types'
 /**
@@ -31,15 +30,17 @@ export const addAthlete = async (record: InsertAthlete, user_id: string): Promis
  * Fetch all athletes
  * @param {function} setState Optionally pass in a hook or callback to set the state
  */
-export const fetchAthletes = async (setState?: Dispatch<SetStateAction<Athlete[]>>): Promise<Athlete[] | undefined> => {
+export const fetchAthletes = async (
+  user_id: string,
+  setState?: Dispatch<SetStateAction<Athlete[]>>
+): Promise<Athlete[] | undefined> => {
   try {
-    const cookies = Cookies()
-    let { data } = await supabase.from('athletes').select('*').eq('created_by', cookies.id)
+    let { data } = await supabase.from('athletes').select('*').eq('created_by', user_id)
     data = data || []
     const { data: team_members } = await supabase
       .from('team_members')
       .select('team_roster(athlete(*))')
-      .eq('user', cookies.id)
+      .eq('user', user_id)
     for (const { team_roster } of team_members || []) {
       for (const roster of team_roster) {
         const { athlete } = roster as unknown as { athlete: Athlete }

@@ -1,10 +1,8 @@
-import { Cookies } from '@/lib/helpers/cookie'
 import { supabase } from '@/lib/store'
 import { Dispatch, SetStateAction } from 'react'
 import { CalendarEvent } from '../event/types'
 import { Team } from '../team/types'
 import { InsertInvitee, Invitee, InviteeAthlete } from './types'
-const cookies = Cookies()
 /**
  * Inserts a new invitee record into the database.
  *
@@ -50,15 +48,18 @@ export const inviteAthletes = async (records: InsertInvitee[], invited_by: strin
  * Fetch all invitees
  * @param {function} setState Optionally pass in a hook or callback to set the state
  */
-export const fetchInvitees = async (setState?: Dispatch<SetStateAction<Invitee[]>>): Promise<Invitee[] | undefined> => {
+export const fetchInvitees = async (
+  user_id: string,
+  setState?: Dispatch<SetStateAction<Invitee[]>>
+): Promise<Invitee[] | undefined> => {
   try {
     const event_columns = 'slug, team, event_type, start_date, start_time, duration, location'
-    let { data } = await supabase.from('invitees').select(`*, event(${event_columns})`).eq('invited_by', cookies.id)
+    let { data } = await supabase.from('invitees').select(`*, event(${event_columns})`).eq('invited_by', user_id)
     data = data || []
     const { data: team_members } = await supabase
       .from('team_members')
       .select(`team(events(${event_columns})), team_roster(athlete(*, invited_to:invitees(*)))`)
-      .eq('user', cookies.id)
+      .eq('user', user_id)
 
     for (const { team_roster, ...tm } of team_members || []) {
       const team = tm.team as unknown as Team & { events: CalendarEvent[] }

@@ -1,12 +1,11 @@
 'use client'
-import { Cookies } from '@/lib/helpers/cookie'
 import { supabase } from '@/lib/store'
 import { REALTIME_LISTEN_TYPES } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
 import { useEffect, useState } from 'react'
 
 export default function useRecordings() {
-  const token = Cookies().token
+  const token = localStorage.getItem('token') || ''
   const { id, username } = jwt.decode(token) as Record<string, string>
   const [recordings, setRecordings] = useState<
     {
