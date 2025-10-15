@@ -58,7 +58,7 @@ export function CreateItemDialog() {
       </Button>
       <Dialog open={isOpen} onClose={setIsOpen}>
         <form action="" method="POST" onSubmit={handleSubmit}>
-          <DialogTitle>Create an event</DialogTitle>
+          <DialogTitle className="max-sm:hidden">Create an event</DialogTitle>
           <DialogDescription>Please fill in the details for the new event.</DialogDescription>
           <DialogBody>
             {/* ... */}

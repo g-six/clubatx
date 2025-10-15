@@ -46,6 +46,7 @@ export function useApp({ token }: { token: string }) {
                 team: { name: string; short_name: string; events: CalendarEvent[] }
                 team_roster: { slug: string; positions: string[]; athlete: Athlete }[]
               }
+
               const idx = ts.findIndex((t) => t.name === team.name)
               if (idx === -1) {
                 ts.push({
@@ -99,7 +100,6 @@ export function useApp({ token }: { token: string }) {
                 }
               }
             }
-
             setTeams(ts)
 
             supabase

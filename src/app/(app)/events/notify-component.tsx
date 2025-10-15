@@ -4,6 +4,7 @@ import { Button } from '@/components/button'
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/dialog'
 import { Field, Label } from '@/components/fieldset'
 import { Textarea } from '@/components/textarea'
+import { getFormattedTime } from '@/lib/helpers/datetime'
 import { useState } from 'react'
 
 export function NotifyComponent(p: {
@@ -15,19 +16,7 @@ export function NotifyComponent(p: {
 }) {
   const [selected, setSelected] = useState<string[]>([])
   const [message, setMessage] = useState(
-    `${p['data-event'].event_type.at(0)?.toUpperCase() + p['data-event'].event_type.slice(1)} scheduled ${new Intl.DateTimeFormat(
-      undefined,
-      {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }
-    ).format(
-      new Date(`${p['data-event'].start_date} ${p['data-event'].start_time}:00`)
-    )} at ${p['data-event'].location}.\nReply with a Y or N to notify our coaches.\n- Automated Reminder by ClubAtx -`
+    `${p['data-event'].event_type.at(0)?.toUpperCase() + p['data-event'].event_type.slice(1)} scheduled ${getFormattedTime(p['data-event'].start_date, p['data-event'].start_time, ' - ')} at ${p['data-event'].location}.\nReply with a Y or N to notify our coaches.\n- clubathletix.com -`
   )
 
   return (
@@ -37,9 +26,10 @@ export function NotifyComponent(p: {
         <DialogDescription>Select the team members to notify.</DialogDescription>
         <DialogBody>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {p['data-items'].map((person) => (
+            {p['data-items'].map((person, idx) => (
               <div
-                key={person.slug}
+                key={idx}
+                data-object={JSON.stringify(person)}
                 data-selected={selected.includes(person.slug) ? '' : undefined}
                 className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-xs hover:border-gray-400 data-selected:outline-2 data-selected:outline-offset-2 data-selected:outline-cyan-600 dark:border-white/10 dark:bg-gray-800/50 dark:shadow-none dark:hover:border-white/25 dark:data-selected:outline-cyan-500"
                 onClick={() => {
