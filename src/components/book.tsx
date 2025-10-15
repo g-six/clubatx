@@ -1,7 +1,7 @@
 'use client'
 import { Button } from '@/components/button'
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/dialog'
-import { Field, FieldGroup, Fieldset, Label } from '@/components/fieldset'
+import { ErrorMessage, Field, FieldGroup, Fieldset, Label } from '@/components/fieldset'
 import { Input } from '@/components/input'
 import { parseForm } from '@/lib/form'
 import * as Headless from '@headlessui/react'
@@ -13,6 +13,7 @@ import { filterTeamMemberships } from '@/lib/models/team'
 import { Team } from '@/lib/models/team/types'
 import { supabase } from '@/lib/store'
 import { XCircleIcon } from '@heroicons/react/16/solid'
+import { VideoCameraIcon } from '@heroicons/react/24/solid'
 import { decode } from 'jsonwebtoken'
 import { FormEvent, useEffect, useState } from 'react'
 import { Select } from './select'
@@ -61,8 +62,14 @@ export function BookDialog() {
     }
   }, [])
 
-  console.table(user)
-
+  const resetFormAndClose = (event: FormEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    setStatus('Create')
+    setTeamKeyword('')
+    setTeams([])
+    setLocationFreeForm(false)
+    setIsOpen(false)
+  }
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -76,6 +83,11 @@ export function BookDialog() {
       location: string
       start_date: string
       start_time: string
+    }
+
+    if (!team || !start_date) {
+      setStatus('Please enter team name')
+      return
     }
     try {
       setStatus('Creating...')
@@ -113,6 +125,8 @@ export function BookDialog() {
             setIsOpen(false)
           }
         }
+      } else {
+        setStatus('Email is required')
       }
     } catch (error) {
       console.error('Error creating item:', error)
@@ -122,11 +136,20 @@ export function BookDialog() {
   }
   return (
     <>
-      <Button color="rose" className="mt-4 w-full py-2! text-xl!" onClick={() => setIsOpen(true)}>
+      <Button color="rose" className="mt-4 w-full py-2! text-xl! max-sm:hidden" onClick={() => setIsOpen(true)}>
         Book now
       </Button>
+      <button
+        type="button"
+        className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-500 text-white shadow-lg sm:hidden"
+        onClick={() => {
+          setIsOpen(true)
+        }}
+      >
+        <VideoCameraIcon className="size-8" />
+      </button>
       <Dialog open={isOpen} onClose={setIsOpen} size="md">
-        <form action="" method="POST" onSubmit={handleSubmit}>
+        <form action="" method="POST" onSubmit={handleSubmit} ref={(el) => el?.reset()}>
           <DialogTitle>Book a recording</DialogTitle>
           <DialogDescription>Please fill in the details for the new recording.</DialogDescription>
           <DialogBody>
@@ -176,12 +199,14 @@ export function BookDialog() {
                   <Label>Team name</Label>
                   <Input
                     name="team"
+                    invalid={status.startsWith('Please ') && status.includes('team')}
                     value={teamKeyword}
                     placeholder={user?.username ? 'Start typing to search...' : 'Enter team name'}
                     onChange={(evt) => {
                       setTeamKeyword(evt.target.value)
                     }}
                   />
+                  {status.startsWith('Please ') && status.includes('team') && <ErrorMessage>{status}</ErrorMessage>}
                   <div className="relative w-full">
                     <div className="backdrop-blur-2xl/50 absolute top-1 z-10 max-h-40 w-full rounded-xl bg-black">
                       {teams
@@ -262,11 +287,20 @@ export function BookDialog() {
           </DialogBody>
           <DialogActions>
             {status !== 'Close' && (
-              <Button plain onClick={() => setIsOpen(false)}>
+              <Button
+                plain
+                onClick={(e) => {
+                  setStatus('Create')
+                  setIsOpen(false)
+                }}
+                type="reset"
+              >
                 Cancel
               </Button>
             )}
-            <Button type="submit">{status}</Button>
+            <Button type="submit" color={status.startsWith('Please ') ? 'red' : 'rose'}>
+              {status}
+            </Button>
           </DialogActions>
         </form>
       </Dialog>

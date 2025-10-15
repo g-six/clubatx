@@ -14,9 +14,8 @@ export default function LoginDialogComponent({ searchParams }: { searchParams: P
       <div className="sm:hidden">
         <button
           type="button"
-          className="flex size-16 items-center justify-center"
+          className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-zinc-800 to-zinc-700 text-white shadow-lg sm:hidden"
           onClick={() => {
-            console.log('login')
             setOpen(true)
           }}
         >
