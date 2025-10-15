@@ -90,7 +90,6 @@ export function BookDialog() {
       // setStatus('Save')
     }
   }
-  console.table(teams)
   return (
     <>
       <Button color="rose" className="mt-4 w-full py-2! text-xl!" onClick={() => setIsOpen(true)}>

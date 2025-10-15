@@ -104,19 +104,19 @@ export const filterTeamMemberships = async (
         } as Team)
       }
 
-      if (!teams.length) {
-        results = await supabase
-          .from('team_members')
-          .select('team:teams(*)')
-          .or(`user.eq.${user.data.id}, created_by.eq.${user.data.id}`)
-        for (const m of results?.data || []) {
-          const { name, short_name } = m.team
+      results = await supabase
+        .from('team_members')
+        .select('team:teams(*)')
+        .or(`user.eq.${user.data.id}, created_by.eq.${user.data.id}`)
+      for (const m of results?.data || []) {
+        const { name, short_name } = m.team
+        if (!teams.find((t) => t.name === name))
           teams.push({
             name,
             short_name,
           } as Team)
-        }
       }
+
       if (setState && teams) setState(teams)
       return teams
     }

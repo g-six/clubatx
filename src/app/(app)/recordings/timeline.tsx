@@ -3,6 +3,7 @@ import { Button } from '@/components/button'
 import { getFormattedTime } from '@/lib/helpers/datetime'
 import { getDaysHoursMinutesAfterKickoff } from '@/lib/models/event/store'
 import UserContext from '@/lib/user-context'
+import { CheckBadgeIcon } from '@heroicons/react/16/solid'
 import { ChatBubbleLeftEllipsisIcon, TagIcon, VideoCameraIcon } from '@heroicons/react/20/solid'
 import { Fragment, useContext } from 'react'
 import { ViewDialog } from './player'
@@ -159,29 +160,46 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                           <div className="flex size-8 items-center justify-center rounded-full bg-zinc-100 ring-8 ring-white dark:bg-zinc-800 dark:ring-zinc-900">
                             <VideoCameraIcon aria-hidden="true" className="size-5 text-zinc-500 dark:text-zinc-400" />
                           </div>
+
+                          {item.status?.toLowerCase() === 'paid' && (
+                            <span className="absolute -right-1 -bottom-1">
+                              <CheckBadgeIcon
+                                aria-hidden="true"
+                                className="size-5 text-cyan-400 opacity-50"
+                                title={item.status?.toLowerCase()}
+                              />
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex min-w-0 flex-1 flex-wrap justify-between py-1.5">
-                        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-                          Booked for {item.team}{' '}
+                      <div className="flex min-w-0 flex-1 flex-wrap py-1.5">
+                        <div className="flex-1 text-sm">
+                          <div className="font-medium text-zinc-900 dark:text-white">Booked for {item.team}</div>
+                          <div className="text-sm text-zinc-500 dark:text-zinc-400">{item.location}</div>
                         </div>
-                        <Badge color={item.status?.toLowerCase() === 'paid' ? 'lime' : 'yellow'}>
-                          {getFormattedTime(item.event_date, item.event_time)}
-                        </Badge>
-                        <div className="text-sm">{item.location}</div>
+                        <div className="text-sm">
+                          <Badge
+                            color={item.status?.toLowerCase() === 'paid' ? 'cyan' : 'yellow'}
+                            className="max-sm:text-right max-sm:whitespace-pre-line!"
+                          >
+                            {getFormattedTime(item.event_date, item.event_time, '\n')}
+                          </Badge>
+                        </div>
                         {item.status?.toLowerCase() !== 'paid' && (
-                          <div className="mt-2 w-full">
-                            <Button
-                              href={`https://pay.clubathletix.com/b/eVq3cv5lJ53dcyt9T9aAw05?${[
-                                `locked_prefilled_email=${ctx.user?.username}&client_reference_id=${item.id}`,
-                              ].join('&')}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              color="lime"
-                              className="w-full"
-                            >
-                              Complete Payment
-                            </Button>
+                          <div className="mt-2 flex w-full justify-end">
+                            <div className="max-sm:w-full">
+                              <Button
+                                href={`https://pay.clubathletix.com/b/eVq3cv5lJ53dcyt9T9aAw05?${[
+                                  `locked_prefilled_email=${ctx.user?.username}&client_reference_id=${item.id}`,
+                                ].join('&')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                color="lime"
+                                className="w-full"
+                              >
+                                Complete Payment
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
