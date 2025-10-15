@@ -3,7 +3,7 @@ import { Button } from '@/components/button'
 import { getFormattedTime } from '@/lib/helpers/datetime'
 import { getDaysHoursMinutesAfterKickoff } from '@/lib/models/event/store'
 import UserContext from '@/lib/user-context'
-import { CheckBadgeIcon } from '@heroicons/react/16/solid'
+import { CheckBadgeIcon, DocumentCurrencyDollarIcon } from '@heroicons/react/16/solid'
 import { ChatBubbleLeftEllipsisIcon, TagIcon, VideoCameraIcon } from '@heroicons/react/20/solid'
 import { Fragment, useContext } from 'react'
 import { ViewDialog } from './player'
@@ -161,15 +161,21 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                             <VideoCameraIcon aria-hidden="true" className="size-5 text-zinc-500 dark:text-zinc-400" />
                           </div>
 
-                          {item.status?.toLowerCase() === 'paid' && (
-                            <span className="absolute -right-1 -bottom-1">
+                          <span className="absolute -right-1 -bottom-1">
+                            {item.status?.toLowerCase() === 'paid' ? (
                               <CheckBadgeIcon
                                 aria-hidden="true"
-                                className="size-5 text-cyan-400 opacity-50"
+                                className="size-5 text-cyan-400"
                                 title={item.status?.toLowerCase()}
                               />
-                            </span>
-                          )}
+                            ) : (
+                              <DocumentCurrencyDollarIcon
+                                aria-hidden="true"
+                                className="size-5 text-rose-400"
+                                title={item.status?.toLowerCase()}
+                              />
+                            )}
+                          </span>
                         </div>
                       </div>
                       <div className="flex min-w-0 flex-1 flex-wrap py-1.5">
