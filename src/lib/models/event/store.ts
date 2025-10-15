@@ -64,10 +64,11 @@ export const useTeamEvents = (): {
   }
 }
 
-export function getDaysHoursMinutesBeforeKickoff(date: Date) {
+export function getDaysHoursMinutesBeforeKickoff(date: string | Date) {
+  if (typeof date === 'string') return { best: '' }
   const now = new Date()
   const diffMs = date.getTime() - now.getTime()
-  if (diffMs <= 0) return { days: 0, hours: 0, minutes: 0 }
+  if (diffMs <= 0) return getDaysHoursMinutesAfterKickoff(date)
 
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
   const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
@@ -76,7 +77,7 @@ export function getDaysHoursMinutesBeforeKickoff(date: Date) {
     days > 1
       ? `${days} days`
       : days === 1
-        ? hours <= 6
+        ? hours <= 16
           ? 'Tomorrow'
           : new Intl.DateTimeFormat(undefined, { weekday: 'long' }).format(date)
         : hours > 16

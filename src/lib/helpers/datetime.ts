@@ -1,5 +1,17 @@
 export function getFormattedTime(event_date: string, event_time: string) {
   try {
+    const dt = getLocalDateFromDateAndTime(event_date, event_time)
+    if (typeof dt === 'string') return dt
+    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(dt)
+  } catch (e: any) {
+    console.log([event_date, event_time, e.message].join(' - '))
+  }
+
+  return [event_date, event_time].join(' ')
+}
+
+export function getLocalDateFromDateAndTime(event_date: string, event_time: string) {
+  try {
     const ymd = event_date
       .split('-')
       .map(Number)
@@ -16,10 +28,9 @@ export function getFormattedTime(event_date: string, event_time: string) {
     dt.setFullYear(ymd.pop()!)
     dt.setHours(hm[0])
     dt.setMinutes(hm[1])
-    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(dt)
+    return dt
   } catch (e: any) {
-    alert([event_date, event_time, e.message].join(' - '))
+    console.log([event_date, event_time, e.message].join(' - '))
   }
-
   return [event_date, event_time].join(' ')
 }

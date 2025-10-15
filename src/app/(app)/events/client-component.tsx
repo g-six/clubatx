@@ -4,6 +4,7 @@ import { Divider } from '@/components/divider'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
 import { Link } from '@/components/link'
 import { postRequest } from '@/lib/helpers/api'
+import { getFormattedTime, getLocalDateFromDateAndTime } from '@/lib/helpers/datetime'
 import { filterAthletes } from '@/lib/models/athlete'
 import { getDaysHoursMinutesBeforeKickoff, useTeamEvents } from '@/lib/models/event/store'
 import { CalendarEvent } from '@/lib/models/event/types'
@@ -107,13 +108,14 @@ export default function EventsPageClientComponent() {
                     <div className="text-xs/6 text-zinc-500">
                       {item.location}
                       <span aria-hidden="true">{' • '}</span>
-                      {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(
-                        new Date(`${item.start_date} ${item.start_time}:00`)
-                      )}
+                      {getFormattedTime(item.start_date, item.start_time)}
                       {' • '}
                       {humanizeDuration(item.duration)}
                       {' • '}
-                      {getDaysHoursMinutesBeforeKickoff(new Date(`${item.start_date} ${item.start_time}:00`)).best}
+                      {
+                        getDaysHoursMinutesBeforeKickoff(getLocalDateFromDateAndTime(item.start_date, item.start_time))
+                          .best
+                      }
                     </div>
                     <div className={item.invitees?.length ? 'flex flex-wrap gap-1' : 'hidden'}>
                       {item.invitees?.map((record) => (
