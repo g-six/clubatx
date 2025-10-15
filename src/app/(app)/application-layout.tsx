@@ -24,10 +24,11 @@ import {
 } from '@heroicons/react/16/solid'
 import { Cog6ToothIcon, HomeIcon, MapPinIcon, Square2StackIcon } from '@heroicons/react/20/solid'
 import { Session } from '@supabase/supabase-js'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useContext, useEffect, useState } from 'react'
 
 function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
+  const ctx = useContext(UserContext)
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
       {/* <DropdownItem href="#">
@@ -44,7 +45,12 @@ function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' })
         <DropdownLabel>Share feedback</DropdownLabel>
       </DropdownItem>
       <DropdownDivider /> */}
-      <DropdownItem href="/login">
+      <DropdownItem
+        onClick={() => {
+          ctx.signOut()
+          location.href = '/'
+        }}
+      >
         <ArrowRightStartOnRectangleIcon />
         <DropdownLabel>Sign out</DropdownLabel>
       </DropdownItem>
@@ -60,7 +66,6 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
   const [authLoaded, setUserLoaded] = useState<boolean>(false)
 
   const [s, setSession] = useState<Session | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     function saveSession(
