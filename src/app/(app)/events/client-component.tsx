@@ -107,6 +107,16 @@ export default function EventsPageClientComponent() {
                     <div className="font-semibold capitalize max-sm:text-2xl/8 sm:text-base/6">
                       {item.event_type.toLowerCase()}
                     </div>
+                    <div>
+                      <Badge className="capitalize" color={item.event_type === 'training' ? 'yellow' : 'lime'}>
+                        {item.team}
+                      </Badge>
+                      {item.opponent && (
+                        <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'rose'}>
+                          {item.opponent}
+                        </Badge>
+                      )}
+                    </div>
                     <div className="sm:text-xs/6 sm:text-zinc-500">
                       <span>{item.location}</span>
                       <span aria-hidden="true" className="max-sm:hidden">
@@ -126,14 +136,6 @@ export default function EventsPageClientComponent() {
                 </div>
                 <div className="flex w-full flex-col items-start gap-2 sm:w-1/3 sm:items-end">
                   <div className="flex gap-4 max-sm:w-full max-sm:justify-between sm:items-center">
-                    <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'lime'}>
-                      {item.team}
-                    </Badge>
-                    {item.opponent && (
-                      <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'rose'}>
-                        {item.opponent}
-                      </Badge>
-                    )}
                     <div className="flex-1 sm:hidden" />
                     {ctx.user?.teams?.find(
                       (t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role.toUpperCase()) && t.name === item.team
