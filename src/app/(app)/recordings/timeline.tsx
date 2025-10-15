@@ -1,7 +1,10 @@
 import { Badge } from '@/components/badge'
+import { Button } from '@/components/button'
+import { getFormattedTime } from '@/lib/helpers/datetime'
 import { getDaysHoursMinutesAfterKickoff } from '@/lib/models/event/store'
+import UserContext from '@/lib/user-context'
 import { ChatBubbleLeftEllipsisIcon, TagIcon, VideoCameraIcon } from '@heroicons/react/20/solid'
-import { Fragment } from 'react'
+import { Fragment, useContext } from 'react'
 import { ViewDialog } from './player'
 
 const defaultItems: any[] = [
@@ -58,6 +61,7 @@ function classNames(...classes: any[]) {
 }
 
 export default function TimelineComponent({ items = defaultItems }: { items?: typeof defaultItems }) {
+  const ctx = useContext(UserContext)
   return (
     <div className="mt-6 flow-root">
       <ul role="list" className="-mb-8">
@@ -129,15 +133,28 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                           </div>
                         </div>
                       </div>
-                      <div className="flex min-w-0 flex-1 justify-between py-1.5">
+                      <div className="flex min-w-0 flex-1 flex-wrap justify-between py-1.5">
                         <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
                           Booked for {item.team}{' '}
                         </div>
                         <Badge color={item.status?.toLowerCase() === 'paid' ? 'lime' : 'yellow'}>
-                          {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(
-                            new Date(`${item.event_date} ${item.event_time}:00`)
-                          )}
+                          {getFormattedTime(item.event_date, item.event_time)}
                         </Badge>
+                        {item.status?.toLowerCase() !== 'paid' && (
+                          <div className="mt-2 w-full">
+                            <Button
+                              href={`https://pay.clubathletix.com/b/eVq3cv5lJ53dcyt9T9aAw05?${[
+                                `locked_prefilled_email=${ctx.user?.username}&client_reference_id=${item.id}`,
+                              ].join('&')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              color="lime"
+                              className="w-full"
+                            >
+                              Complete Payment
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </>
                   ) : item.status === 'tags' ? (
