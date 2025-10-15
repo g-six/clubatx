@@ -117,7 +117,35 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                       </div>
                       <div className="flex min-w-0 flex-1 flex-wrap justify-between py-1.5 text-sm text-zinc-500 dark:text-zinc-400">
                         <div>
-                          <ViewDialog name={[item.team, item.event_type?.toLowerCase()].join(' ')} src={item.slug} />
+                          <ViewDialog
+                            name={[item.team, item.event_type?.toLowerCase()].join(' ')}
+                            src={item.slug}
+                            startTime={item.starts_at_second}
+                          />
+                          <div className="text-sm">
+                            {[
+                              item.location,
+                              item.home_or_away?.toUpperCase().at(0) + item.home_or_away?.toLowerCase().slice(1),
+                              [
+                                item.home_or_away?.toUpperCase() === 'HOME'
+                                  ? `${item.home} - ${item.away}`
+                                  : `${item.away} - ${item.home}`,
+                                item.home_or_away?.toUpperCase() === 'HOME'
+                                  ? item.home > item.away
+                                    ? '(W)'
+                                    : item.home < item.away
+                                      ? '(L)'
+                                      : '(D)'
+                                  : item.home < item.away
+                                    ? '(W)'
+                                    : item.home > item.away
+                                      ? '(L)'
+                                      : '(D)',
+                              ].join(' '),
+                            ]
+                              .filter(Boolean)
+                              .join(' • ')}
+                          </div>
                         </div>
                         <div>
                           {getDaysHoursMinutesAfterKickoff(new Date(`${item.event_date} ${item.event_time}:00`))?.best}
@@ -140,6 +168,7 @@ export default function TimelineComponent({ items = defaultItems }: { items?: ty
                         <Badge color={item.status?.toLowerCase() === 'paid' ? 'lime' : 'yellow'}>
                           {getFormattedTime(item.event_date, item.event_time)}
                         </Badge>
+                        <div className="text-sm">{item.location}</div>
                         {item.status?.toLowerCase() !== 'paid' && (
                           <div className="mt-2 w-full">
                             <Button

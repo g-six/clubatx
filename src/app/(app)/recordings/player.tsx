@@ -5,11 +5,12 @@ import { Textarea } from '@/components/textarea'
 import { Stream } from '@cloudflare/stream-react'
 
 import { XCircleIcon } from '@heroicons/react/24/solid'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 export function ViewDialog(p: { name?: string; src: string; startTime?: number; className?: string }) {
   let [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState('view')
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   return (
     <>
@@ -36,7 +37,20 @@ export function ViewDialog(p: { name?: string; src: string; startTime?: number; 
         <DialogDescription></DialogDescription>
         <DialogBody>
           <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-            <Stream controls {...p} onLoadedMetaData={console.log} />
+            {p.src.endsWith('.mp4') ? (
+              <video
+                ref={videoRef}
+                controls
+                src={p.src}
+                className="h-full w-full"
+                onLoadedMetadata={(evt) => {
+                  console.table(p)
+                  evt.currentTarget.currentTime = p.startTime || 0
+                }}
+              />
+            ) : (
+              <Stream controls {...p} onLoadedMetaData={console.log} />
+            )}
           </div>
           <div className={mode === 'notes' ? 'relative mt-8 w-full' : 'hidden'}>
             <Textarea rows={10} />

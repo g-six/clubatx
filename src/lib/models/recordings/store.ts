@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 
 export default function useRecordings() {
   const token = localStorage.getItem('token') || ''
+  if (!token) return []
   const { id, username } = jwt.decode(token) as Record<string, string>
   const [recordings, setRecordings] = useState<
     {
