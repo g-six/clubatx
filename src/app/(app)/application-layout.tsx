@@ -1,5 +1,6 @@
 'use client'
 import { Avatar } from '@/components/avatar'
+import { BookDialog } from '@/components/book'
 import { Dropdown, DropdownButton, DropdownItem, DropdownLabel, DropdownMenu } from '@/components/dropdown'
 import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '@/components/navbar'
 import {
@@ -26,6 +27,7 @@ import { Cog6ToothIcon, HomeIcon, MapPinIcon, Square2StackIcon } from '@heroicon
 import { Session } from '@supabase/supabase-js'
 import { usePathname } from 'next/navigation'
 import { useContext, useEffect, useState } from 'react'
+import { CreateItemDialog } from './events/create'
 
 function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
   const ctx = useContext(UserContext)
@@ -237,6 +239,22 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
       >
         {children}
       </SidebarLayout>
+      <div
+        role="button"
+        className="fixed w-full max-sm:bottom-6 max-sm:left-1/2 max-sm:max-w-sm max-sm:-translate-x-1/2 sm:top-0 sm:right-0 sm:hidden"
+      >
+        <div className="flex w-full justify-center backdrop-blur-lg max-sm:rounded-3xl max-sm:bg-black/20 sm:justify-end max-sm:dark:bg-white/20">
+          {/** Repeat elements with this */}
+          <div className="sm:py-2 sm:not-last:px-2 sm:last:pr-2">
+            <BookDialog />
+          </div>
+          {Boolean(user?.teams?.find((t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role?.toUpperCase()))) && (
+            <div className="sm:py-2 sm:not-last:px-2 sm:last:pr-2">
+              <CreateItemDialog />
+            </div>
+          )}
+        </div>
+      </div>
     </UserContext.Provider>
   ) : (
     <></>

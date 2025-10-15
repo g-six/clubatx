@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default async function Events() {
   return (
     <>
-      <Heading>Events</Heading>
+      <Heading className="max-sm:hidden">Events</Heading>
       <EventsPageClientComponent />
     </>
   )

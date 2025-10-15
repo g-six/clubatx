@@ -16,6 +16,7 @@ import { XCircleIcon } from '@heroicons/react/16/solid'
 import { VideoCameraIcon } from '@heroicons/react/24/solid'
 import { decode } from 'jsonwebtoken'
 import { FormEvent, useEffect, useState } from 'react'
+import { Heading } from './heading'
 import { Select } from './select'
 
 export function BookDialog() {
@@ -141,11 +142,12 @@ export function BookDialog() {
       </Button>
       <button
         type="button"
-        className="mx-1.5 my-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-lime-500 to-green-500 text-white shadow-lg sm:hidden"
+        className="mx-1.5 my-3 flex size-16 flex-col items-center justify-center rounded-2xl bg-gradient-to-tr from-lime-500 to-green-500 text-white shadow-lg sm:hidden"
         onClick={() => {
           setIsOpen(true)
         }}
       >
+        <Heading className="mt-1 text-[0.55rem]/2! font-bold! text-green-800! uppercase">Book</Heading>
         <VideoCameraIcon className="size-8" />
       </button>
       <Dialog open={isOpen} onClose={setIsOpen} size="md">

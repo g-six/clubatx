@@ -8,8 +8,10 @@ import { parseForm } from '@/lib/form'
 import { addCalendarEvent } from '@/lib/models/event'
 import { useTeams } from '@/lib/models/team/store'
 
+import { Heading } from '@/components/heading'
 import { useLocations } from '@/lib/models/location/store'
 import UserContext from '@/lib/user-context'
+import { CalendarDateRangeIcon } from '@heroicons/react/24/solid'
 import { FormEvent, useContext, useState } from 'react'
 import { InsertCalendarEvent } from '../../../lib/models/event/types'
 
@@ -53,9 +55,19 @@ export function CreateItemDialog() {
 
   return (
     <>
-      <Button type="button" onClick={() => setIsOpen(true)}>
+      <Button type="button" className="max-sm:hidden" onClick={() => setIsOpen(true)}>
         Create event
       </Button>
+      <button
+        type="button"
+        className="mx-1.5 my-3 flex size-16 flex-col items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 shadow-lg sm:hidden"
+        onClick={() => {
+          setIsOpen(true)
+        }}
+      >
+        <Heading className="mt-1 text-[0.55rem]/2! font-bold! text-amber-950! uppercase">Schedule</Heading>
+        <CalendarDateRangeIcon className="size-8" />
+      </button>
       <Dialog open={isOpen} onClose={setIsOpen}>
         <form action="" method="POST" onSubmit={handleSubmit}>
           <DialogTitle className="max-sm:hidden">Create an event</DialogTitle>

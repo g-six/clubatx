@@ -55,7 +55,6 @@ export default function EventsPageClientComponent() {
     toggleInvite(false)
   }
 
-  console.log(ctx.user?.teams)
   return (
     <>
       {/* <div className="flex flex-wrap items-end justify-between gap-4">
@@ -78,11 +77,11 @@ export default function EventsPageClientComponent() {
         </div>
         </div> */}
       {ctx.user?.teams?.find((t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role.toUpperCase())) && (
-        <div className="flex w-full flex-wrap justify-end gap-4">
+        <div className="flex w-full flex-wrap justify-end gap-4 max-sm:hidden">
           <CreateItemDialog />
         </div>
       )}
-      <div className="mt-10 flex flex-col gap-4 divide-y divide-zinc-800">
+      <div className="flex flex-col gap-4 divide-y divide-zinc-800 sm:mt-10">
         {(ctx.user?.calendar || [])
           .filter((item) => {
             let shouldInclude = Boolean(item.slug)
@@ -103,7 +102,7 @@ export default function EventsPageClientComponent() {
           .map((item, index) => (
             <div key={item.slug} className="pb-6">
               <div className="flex justify-between max-sm:flex-col max-sm:items-center max-sm:justify-start">
-                <div className="flex gap-6 max-sm:w-full max-sm:py-6">
+                <div className="flex gap-6 max-sm:w-full max-sm:pb-6">
                   <div className="space-y-1.5">
                     <div className="font-semibold capitalize max-sm:text-2xl/8 sm:text-base/6">
                       {item.event_type.toLowerCase()}
@@ -135,6 +134,7 @@ export default function EventsPageClientComponent() {
                         {item.opponent}
                       </Badge>
                     )}
+                    <div className="flex-1 sm:hidden" />
                     {ctx.user?.teams?.find(
                       (t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role.toUpperCase()) && t.name === item.team
                     ) ? (
