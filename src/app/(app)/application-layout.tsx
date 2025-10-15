@@ -81,10 +81,7 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
   }, [])
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (!error) {
-      router.push('/')
-    }
+    localStorage.clear()
   }
   return user?.id ? (
     <UserContext.Provider
