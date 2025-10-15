@@ -125,3 +125,29 @@ export const filterManyInvitees = async (slugs: string[], event: string): Promis
     console.log('error', error)
   }
 }
+
+/**
+ * Updates an invitee record in the database.
+ *
+ * @param event - The event slug to update.
+ * @param athletes - The athlete slug of the invitee to update.
+ * @param updates - The fields to update.
+ * @returns A promise that resolves to the updated invitee object, or undefined if an error occurs.
+ */
+export const updateInvitees = async (
+  event: string,
+  athletes: string[],
+  updates: Partial<Invitee>
+): Promise<Invitee[] | undefined> => {
+  try {
+    const { data } = await supabase
+      .from('invitees')
+      .update(updates)
+      .eq('event', event)
+      .ilikeAnyOf('athlete', athletes)
+      .select()
+    return data as Invitee[]
+  } catch (error) {
+    console.log('error', error)
+  }
+}

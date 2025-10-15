@@ -10,6 +10,7 @@ export type InsertCalendarEvent = {
   phone: string
   location: string
   slug: string
+  opponent?: string
 }
 
 export type CalendarEvent = InsertCalendarEvent & {

@@ -1,17 +1,19 @@
 'use client'
 import { Badge } from '@/components/badge'
-import { Divider } from '@/components/divider'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
+import { Label } from '@/components/fieldset'
 import { Link } from '@/components/link'
+import { Switch } from '@/components/switch'
 import { postRequest } from '@/lib/helpers/api'
 import { getFormattedTime, getLocalDateFromDateAndTime } from '@/lib/helpers/datetime'
 import { filterAthletes } from '@/lib/models/athlete'
 import { getDaysHoursMinutesBeforeKickoff, useTeamEvents } from '@/lib/models/event/store'
 import { CalendarEvent } from '@/lib/models/event/types'
-import { filterManyInvitees, inviteAthletes } from '@/lib/models/invitee'
+import { filterManyInvitees, inviteAthletes, updateInvitees } from '@/lib/models/invitee'
 import { Invitee } from '@/lib/models/invitee/types'
 import { Athlete } from '@/lib/types/athlete.types'
 import UserContext from '@/lib/user-context'
+import { Field } from '@headlessui/react'
 import { EllipsisVerticalIcon } from '@heroicons/react/16/solid'
 import { useContext, useState } from 'react'
 import { InviteComponent } from './invite-component'
@@ -76,7 +78,7 @@ export default function EventsPageClientComponent() {
           <CreateItemDialog />
         )}
       </div> */}
-      <ul className="mt-10">
+      <div className="mt-10 flex flex-col gap-4 divide-y divide-zinc-800">
         {(ctx.user?.calendar || [])
           .filter((item) => {
             let shouldInclude = Boolean(item.slug)
@@ -95,9 +97,8 @@ export default function EventsPageClientComponent() {
             return shouldInclude
           })
           .map((item, index) => (
-            <li key={item.slug}>
-              <Divider soft={index > 0} />
-              <div className="flex items-center justify-between">
+            <div key={item.slug} className="max-sm:pb-6">
+              <div className="flex items-center justify-between max-sm:flex-col">
                 <div className="flex gap-6 py-6">
                   <div className="space-y-1.5">
                     <div className="text-base/6 font-semibold">
@@ -117,32 +118,26 @@ export default function EventsPageClientComponent() {
                           .best
                       }
                     </div>
-                    <div className={item.invitees?.length ? 'flex flex-wrap gap-1' : 'hidden'}>
-                      {item.invitees?.map((record) => (
-                        <Badge
-                          key={record.invitee?.slug || record.athlete}
-                          color={record.status === 'PENDING' ? 'lime' : 'zinc'}
-                        >
-                          {record.invitee?.first_name}{' '}
-                        </Badge>
-                      ))}
-                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-4">
-                  <Badge className="capitalize max-sm:hidden" color={item.event_type === 'training' ? 'zinc' : 'lime'}>
-                    {item.team}
-                  </Badge>
-                  <Dropdown>
-                    <DropdownButton plain aria-label="More options">
-                      <EllipsisVerticalIcon />
-                    </DropdownButton>
-                    <DropdownMenu anchor="bottom end">
-                      {ctx.user?.teams?.find(
-                        (t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role.toUpperCase()) && t.name === item.team
-                      ) ? (
-                        <>
+                <div className="flex w-full flex-col items-end gap-2 sm:w-1/3">
+                  <div className="flex gap-4 sm:items-center">
+                    <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'lime'}>
+                      {item.team}
+                    </Badge>
+                    {item.opponent && (
+                      <Badge className="capitalize" color={item.event_type === 'training' ? 'zinc' : 'rose'}>
+                        {item.opponent}
+                      </Badge>
+                    )}
+                    {ctx.user?.teams?.find(
+                      (t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role.toUpperCase()) && t.name === item.team
+                    ) ? (
+                      <Dropdown>
+                        <DropdownButton plain aria-label="More options">
+                          <EllipsisVerticalIcon />
+                        </DropdownButton>
+                        <DropdownMenu anchor="bottom end">
                           <DropdownItem
                             onClick={() => {
                               toggleNotifier('Send a text reminder')
@@ -159,26 +154,72 @@ export default function EventsPageClientComponent() {
                           >
                             Invite
                           </DropdownItem>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                      <DropdownItem
-                        onClick={() => {
-                          toggleInvite(true)
-                          setInviteEvent(item as typeof inviteEvent)
-                        }}
-                      >
-                        Going
-                      </DropdownItem>
-                      <DropdownItem onClick={() => {}}>Not Going</DropdownItem>
-                    </DropdownMenu>
-                  </Dropdown>
+                        </DropdownMenu>
+                      </Dropdown>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                  {ctx.user?.teams?.find((t) => ['PARENT'].includes(t.role.toUpperCase()) && t.name === item.team) ? (
+                    <div className={item.invitees?.length ? 'flex flex-col items-end justify-end gap-2' : 'hidden'}>
+                      {item.invitees
+                        ?.sort((a, b) => a.invitee?.first_name.localeCompare(b.invitee?.first_name || '') || 0)
+                        .map((record, idx) => (
+                          <div key={record.invitee?.slug || record.athlete} className="shrink">
+                            <Field className="flex items-center gap-2">
+                              <Label className="text-xs">
+                                {record.invitee?.first_name}{' '}
+                                {record.status === 'PENDING'
+                                  ? '(Pending)'
+                                  : record.status === 'GOING' &&
+                                      getLocalDateFromDateAndTime(item.start_date, item.start_time) > new Date()
+                                    ? 'is going'
+                                    : record.status === 'NOT_GOING' &&
+                                        getLocalDateFromDateAndTime(item.start_date, item.start_time) > new Date()
+                                      ? 'is not going'
+                                      : record.status === 'ATTENDED'
+                                        ? 'attended'
+                                        : record.status === 'ABSENT'
+                                          ? 'was absent'
+                                          : ''}
+                              </Label>
+                              <Switch
+                                color={
+                                  getLocalDateFromDateAndTime(item.start_date, item.start_time) < new Date()
+                                    ? 'zinc'
+                                    : 'lime'
+                                }
+                                disabled={getLocalDateFromDateAndTime(item.start_date, item.start_time) < new Date()}
+                                defaultChecked={['ATTENDED', 'GOING'].includes(record.status)}
+                                onChange={(checked) => {
+                                  const athletes = [record.invitee?.slug || record.athlete]
+                                  const event = item.slug
+
+                                  updateInvitees(event, athletes, {
+                                    status: checked ? 'GOING' : 'NOT_GOING',
+                                  })
+                                }}
+                              />
+                            </Field>
+                          </div>
+                          // <Badge
+                          //   key={record.invitee?.slug || record.athlete}
+                          //   color={record.status === 'PENDING' ? 'lime' : 'zinc'}
+                          //   className="cursor-pointer"
+                          // >
+                          //   {record.invitee?.first_name}
+                          //   <ChevronDownIcon className="inline size-4" />
+                          // </Badge>
+                        ))}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </div>
-            </li>
+            </div>
           ))}
-      </ul>
+      </div>
       <InviteComponent isOpen={invite} toggleOpen={toggleInvite} handleSubmit={handleSubmit} />
       {inviteEvent && Boolean(inviteEvent) && (
         <NotifyComponent

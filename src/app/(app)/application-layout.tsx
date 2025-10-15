@@ -205,12 +205,12 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
               <Dropdown>
                 <DropdownButton as={SidebarItem}>
                   <span className="flex min-w-0 items-center gap-3">
-                    <Avatar
+                    {/* <Avatar
                       src="https://viplaril6wogm0dr.public.blob.vercel-storage.com/clubathletix/logos/logo.png"
                       className="size-10"
                       square
                       alt=""
-                    />
+                    /> */}
                     <span className="min-w-0">
                       <span className="block truncate text-sm/5 font-medium text-zinc-950 dark:text-white">
                         {[user?.first_name, user?.last_name].filter(Boolean).join(' ')}
