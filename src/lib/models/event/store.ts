@@ -108,7 +108,7 @@ export function getDaysHoursMinutesAfterKickoff(date: Date) {
         : weeks > 1
           ? `${weeks} weeks ago`
           : days > 1
-            ? `${days} days`
+            ? `${days} days ago`
             : days === 1
               ? hours <= 6
                 ? 'Yesterday'
@@ -116,7 +116,7 @@ export function getDaysHoursMinutesAfterKickoff(date: Date) {
               : hours > 16
                 ? 'Yesterday'
                 : hours > 1
-                  ? `${hours} hours`
-                  : `${minutes} minutes`
+                  ? `${hours} hours ago`
+                  : `${minutes} minutes ago`
   return { days, hours, minutes, best }
 }
