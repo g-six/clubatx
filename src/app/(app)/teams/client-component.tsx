@@ -3,6 +3,7 @@ import { Badge } from '@/components/badge'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
 import { Input, InputGroup } from '@/components/input'
 import { Link } from '@/components/link'
+import TeamGrid from '@/components/teams/card'
 import { CreateTeamDialog } from '@/components/teams/create'
 import { filterLocations } from '@/lib/models/location'
 import { useTeams } from '@/lib/models/team/store'
@@ -106,7 +107,14 @@ export default function TeamsPageClientComponent() {
           <CreateTeamDialog />
         </div>
       </div>
-      <ul className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <TeamGrid
+          items={teams.sort((a: any, b: any) => {
+            if (a[sort] < b[sort]) return -1
+            if (a[sort] > b[sort]) return 1
+            return 0
+          })}
+        />
         {teams
           .sort((a: any, b: any) => {
             if (a[sort] < b[sort]) return -1
@@ -114,7 +122,7 @@ export default function TeamsPageClientComponent() {
             return 0
           })
           .map((item, index) => (
-            <li key={item.name} className="rounded-xl bg-black/5 py-4 dark:bg-black">
+            <div key={item.name} className="rounded-xl bg-black/5 py-4 dark:bg-black">
               <div className="flex items-start justify-between">
                 <div className="flex w-5/6 gap-6 lg:w-3/4">
                   <div className="text-overflow-ellipsis w-full space-y-1.5 overflow-hidden py-1 pl-6 text-ellipsis">
@@ -152,9 +160,9 @@ export default function TeamsPageClientComponent() {
                   </Dropdown>
                 </div>
               </div>
-            </li>
+            </div>
           ))}
-      </ul>
+      </div>
     </>
   )
 }

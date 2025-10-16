@@ -10,6 +10,7 @@ export default function ClientComponent() {
   return (
     <>
       <TimelineComponent items={recordings} />
+      <div className="h-28 w-full sm:hidden" />
     </>
   )
 }
