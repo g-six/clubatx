@@ -13,6 +13,7 @@ import {
   SidebarSection,
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
+import { CreateTeamDialog } from '@/components/teams/create'
 import { useApp } from '@/lib/models/session/store'
 import { supabase } from '@/lib/store'
 import UserContext from '@/lib/user-context'
@@ -251,6 +252,11 @@ export function ApplicationLayout({ children, ...props }: { children: React.Reac
           {Boolean(user?.teams?.find((t) => ['MANAGER', 'COACH', 'ADMIN'].includes(t.role?.toUpperCase()))) && (
             <div className="sm:py-2 sm:not-last:px-2 sm:last:pr-2">
               <CreateItemDialog />
+            </div>
+          )}
+          {Boolean(user?.roles?.map((r) => r?.toUpperCase())?.includes('ADMIN')) && (
+            <div className="sm:py-2 sm:not-last:px-2 sm:last:pr-2">
+              <CreateTeamDialog />
             </div>
           )}
         </div>

@@ -22,7 +22,6 @@ export default function useRecordings() {
   async function fetchRecordings() {
     if (!token) return []
     const { id, username } = jwt.decode(token) as Record<string, string>
-    console.log('fetchRecordings triggered')
     Promise.all([
       supabase.from('team_members').select('team(recordings(*))').eq('user', id),
       supabase.from('bookings').select('*').eq('booked_by', username),

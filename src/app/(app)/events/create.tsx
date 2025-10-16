@@ -80,7 +80,7 @@ export function CreateItemDialog() {
                   <Field className="sm:col-span-2">
                     <Label>Team</Label>
                     <Select name="team" autoFocus>
-                      {team.records.map((item) => (
+                      {team.map((item) => (
                         <option key={item.name} value={item.name}>
                           {item.name}
                         </option>

@@ -13,8 +13,10 @@ export function useApp({ token }: { token: string }) {
   const [calendar, setCalendar] = useState<CalendarEvent[]>()
   const [teams, setTeams] = useState<UserTeam[]>()
   const [roles, setRoles] = useState<string[]>()
+
   function reloadData(payload?: { new?: any; old?: any }) {
     // new Audio('/sounds/new-message.mp3').play()
+    console.log('reloadData', payload)
 
     if (token) {
       const { first_name, last_name, username, id: user_id } = jwt.decode(token) as Record<string, string>
@@ -38,6 +40,7 @@ export function useApp({ token }: { token: string }) {
               .eq('created_by', user_id),
           ]).then(([user_roles, team_members, athletes, teams_created]) => {
             setRoles(user_roles?.data?.map((r) => r.role))
+
             const ts: UserTeam[] = []
             for (const m of team_members?.data || []) {
               const { slug, role, team, team_roster } = m as unknown as {
@@ -234,11 +237,31 @@ export function useApp({ token }: { token: string }) {
       )
       .subscribe()
 
+    const teamListener = supabase
+      .channel('public:teams')
+      .on(
+        REALTIME_LISTEN_TYPES.POSTGRES_CHANGES as any,
+        { event: 'INSERT', schema: 'public', table: 'teams' },
+        reloadData
+      )
+      .on(
+        REALTIME_LISTEN_TYPES.POSTGRES_CHANGES as any,
+        { event: 'UPDATE', schema: 'public', table: 'teams' },
+        reloadData
+      )
+      .on(
+        REALTIME_LISTEN_TYPES.POSTGRES_CHANGES as any,
+        { event: 'DELETE', schema: 'public', table: 'teams' },
+        reloadData
+      )
+      .subscribe()
+
     return () => {
       userListener.unsubscribe()
       athleteListener.unsubscribe()
       inviteeListener.unsubscribe()
       calendarListener.unsubscribe()
+      teamListener.unsubscribe()
     }
   }, [])
 

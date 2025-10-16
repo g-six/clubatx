@@ -2,7 +2,7 @@ import { Heading } from '@/components/heading'
 import type { Metadata } from 'next'
 import LocationsPageClientComponent from './client-component'
 
-const title = 'Locations'
+const title = 'Teams'
 export const metadata: Metadata = {
   title,
 }
@@ -12,6 +12,7 @@ export default async function Events() {
     <>
       <Heading>{title}</Heading>
       <LocationsPageClientComponent />
+      <div className="h-24 sm:hidden" />
     </>
   )
 }

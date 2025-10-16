@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from 'react'
 import { fetchTeams } from '.'
 import { Team, TeamMember } from './types'
 
-export const useTeams = (): { records: Team[] } => {
+export function useTeams(): Team[] {
   const ctx = useContext(UserContext)
   const [records, setRecords] = useState<Team[]>([])
   const [newRecord, handleNewTeam] = useState<Team | null>(null)
@@ -38,7 +38,7 @@ export const useTeams = (): { records: Team[] } => {
 
     // Listen for new and deleted team members
     const membersListener = supabase
-      .channel('public:teams')
+      .channel('public:team_members')
       .on(
         REALTIME_LISTEN_TYPES.POSTGRES_CHANGES as any,
         { event: 'INSERT', schema: 'public', table: 'team_members' },
@@ -113,7 +113,5 @@ export const useTeams = (): { records: Team[] } => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deletedRecord])
 
-  return {
-    records,
-  }
+  return records
 }

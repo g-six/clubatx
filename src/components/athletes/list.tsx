@@ -12,7 +12,7 @@ export default function AthletesList() {
           <TableRow>
             <TableHeader>Name</TableHeader>
             <TableHeader>Date of Birth</TableHeader>
-            <TableHeader>Address</TableHeader>
+            <TableHeader className="max-sm:hidden">Address</TableHeader>
             <TableHeader>Phone</TableHeader>
             <TableHeader className="text-right">&nbsp;</TableHeader>
           </TableRow>
@@ -27,7 +27,7 @@ export default function AthletesList() {
                   ? ` (U${new Date().getFullYear() - new Date(item.date_of_birth).getFullYear() + 1})`
                   : ''}
               </TableCell>
-              <TableCell>
+              <TableCell className="max-sm:hidden">
                 {[
                   item.street_1,
                   item.street_2,
@@ -40,7 +40,9 @@ export default function AthletesList() {
               <TableCell>
                 <div className="flex items-center gap-2">
                   {/* <Avatar src={item.thumbUrl} className="size-6" /> */}
-                  <span className="font-mono text-xs">{item.phone?.split('+1').pop()!}</span>
+                  <span className="font-mono text-xs">
+                    {item.phone?.split('+1').pop()?.split('')?.filter(Boolean).join('')}
+                  </span>
                 </div>
               </TableCell>
               <TableCell className="text-right">&nbsp;</TableCell>
@@ -48,6 +50,7 @@ export default function AthletesList() {
           ))}
         </TableBody>
       </Table>
+      <div className="h-24 w-full sm:hidden" />
     </>
   )
 }

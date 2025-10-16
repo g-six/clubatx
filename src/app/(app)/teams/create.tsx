@@ -10,7 +10,6 @@ import { MapPinIcon } from '@heroicons/react/20/solid'
 import { FormEvent, useContext, useState } from 'react'
 import { LocationType } from './types'
 
-const entity = 'Location'
 export function CreateItemDialog() {
   const ctx = useContext(UserContext)
 
@@ -38,7 +37,7 @@ export function CreateItemDialog() {
     <>
       <Button type="button" onClick={() => setIsOpen(true)}>
         <MapPinIcon />
-        Add new location
+        Add new team
       </Button>
       <Dialog open={isOpen} onClose={setIsOpen}>
         <form action="" method="POST" onSubmit={handleSubmit}>

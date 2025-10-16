@@ -3,13 +3,12 @@ import { Badge } from '@/components/badge'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
 import { Input, InputGroup } from '@/components/input'
 import { Link } from '@/components/link'
-import { Select } from '@/components/select'
+import { CreateTeamDialog } from '@/components/teams/create'
 import { filterLocations } from '@/lib/models/location'
 import { useTeams } from '@/lib/models/team/store'
 import { Team } from '@/lib/models/team/types'
 import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 import { useEffect, useState } from 'react'
-import { CreateItemDialog } from './create'
 
 function getBadgeColor(
   keyword: string
@@ -47,8 +46,9 @@ function getBadgeColor(
       return 'zinc'
   }
 }
-export default function LocationsPageClientComponent() {
-  const store = useTeams()
+export default function TeamsPageClientComponent() {
+  const teams = useTeams()
+
   const [records, setRecords] = useState<Team[]>([])
   const [sort, sortBy] = useState<string>('name')
   const [loading, setLoading] = useState<boolean>(false)
@@ -70,11 +70,10 @@ export default function LocationsPageClientComponent() {
       })
   }, [debouncedSearch])
   useEffect(() => {
-    setRecords(store?.records)
-  }, [store?.records])
+    setRecords(teams as unknown as Team[])
+  }, [teams])
 
   // Optionally, filter locations here using debouncedSearch
-
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -85,7 +84,7 @@ export default function LocationsPageClientComponent() {
                 <MagnifyingGlassIcon />
                 <Input
                   name="search"
-                  placeholder="Search locations&hellip;"
+                  placeholder="Search teams&hellip;"
                   onChange={(e) => {
                     setLoading(true)
                     setDebouncedSearch(undefined)
@@ -94,19 +93,21 @@ export default function LocationsPageClientComponent() {
                 />
               </InputGroup>
             </div>
-            <div>
+            {/* <div>
               <Select name="sort_by" onChange={(e) => sortBy(e.currentTarget.value)}>
                 <option value="name">Sort by name</option>
                 <option value="location_type">Sort by type</option>
                 <option value="city_town">Sort by city</option>
               </Select>
-            </div>
+            </div> */}
           </div>
         </div>
-        <CreateItemDialog />
+        <div className="max-sm:hidden">
+          <CreateTeamDialog />
+        </div>
       </div>
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {records
+        {teams
           .sort((a: any, b: any) => {
             if (a[sort] < b[sort]) return -1
             if (a[sort] > b[sort]) return 1
